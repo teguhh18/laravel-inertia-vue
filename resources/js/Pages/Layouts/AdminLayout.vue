@@ -7,7 +7,9 @@ import { Link } from "@inertiajs/vue3";
         <header>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container">
-                    <Link class="navbar-brand" href="/">MyApp</Link>
+                    <Link class="navbar-brand" :href="route('home')"
+                        >MyApp</Link
+                    >
                     <button
                         class="navbar-toggler"
                         type="button"
@@ -26,10 +28,10 @@ import { Link } from "@inertiajs/vue3";
                     >
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <Link class="nav-link" href="/">Home</Link>
+                                <Link class="nav-link" :href="route('home')">Home</Link>
                             </li>
                             <li class="nav-item">
-                                <Link class="nav-link" href="/user">User</Link>
+                                <Link class="nav-link" :href="route('user.index')">User</Link>
                             </li>
                         </ul>
                     </div>

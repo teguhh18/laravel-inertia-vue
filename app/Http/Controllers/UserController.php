@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -28,14 +29,21 @@ class UserController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('images', 'public');
+        try {
+            DB::beginTransaction();
+
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('images', 'public');
+            }
+
+            $validated['password'] = bcrypt($validated['password']);
+            User::create($validated);
+            DB::commit();
+            return to_route('user.index')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to create user: ' . $e->getMessage());
         }
-
-        $validated['password'] = bcrypt($validated['password']);
-
-        User::create($validated);
-        return to_route('user.index');
     }
 
     public function edit($id)
@@ -55,7 +63,9 @@ class UserController extends Controller
         ]);
 
         if ($request->image != null) {
-            Storage::disk('public')->delete($user->image);
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
             $validated['image'] = $request->file('image')->store('images', 'public');
         } else {
             $validated['image'] = $user->image;
@@ -68,14 +78,23 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        return to_route('user.index');
+        return to_route('user.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        Storage::disk('public')->delete($user->image);
-        $user->delete();
-        return to_route('user.index');
+        try {
+            $user = User::findOrFail($id);
+            DB::beginTransaction();
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+            $user->delete();
+            DB::commit();
+            return back()->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to delete user: ' . $e->getMessage());
+        }
     }
 }

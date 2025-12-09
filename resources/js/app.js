@@ -1,5 +1,6 @@
 import "./bootstrap";
 import { createApp, h } from "vue";
+import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import { createInertiaApp } from "@inertiajs/vue3";
 import PublicLayout from "./Pages/Layouts/PublicLayout.vue";
 import AdminLayout from "./Pages/Layouts/AdminLayout.vue";
@@ -16,6 +17,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(ZiggyVue)
             .mount(el);
     },
     progress: {

@@ -1,5 +1,5 @@
 <script setup>
-import { Head, router, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     user: Object,
@@ -99,6 +99,11 @@ function submit() {
                     <button type="submit" class="btn btn-primary">
                         Update
                     </button>
+                    <Link
+                        :href="route('user.index')"
+                        class="btn btn-secondary ms-2"
+                        >Back</Link
+                    >
                 </form>
             </div>
         </div>
